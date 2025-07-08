@@ -1,0 +1,1649 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RED JUVENIL Villa Aldama</title>
+    <!-- Enlace a Google Fonts para la fuente Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Estilos Generales y Reseteo */
+        :root {
+            --primary-color: #7c40f2;
+            --secondary-color: #2050f4;
+            --accent-color: #b8e04f;
+            --text-dark: #333;
+            --text-light: #f9f9f9; /* Blanco casi puro para el texto sobre el degradado */
+            --bg-light: #ffffff;
+            --bg-dark: #f0f2f5;
+            --shadow-light: rgba(0, 0, 0, 0.1);
+            --shadow-medium: rgba(0, 0, 0, 0.2);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            overflow-x: hidden; /* Evita el scroll horizontal */
+        }
+
+        /* Pantalla de Carga */
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000000; /* Fondo negro */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+            opacity: 1;
+            visibility: visible;
+        }
+
+        #loading-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .circle {
+            /* Modificaciones para hacer los círculos más pequeños */
+            width: 40px; /* Reducido de 80px */
+            height: 40px; /* Reducido de 80px */
+            border-radius: 50%;
+            margin: 0 8px; /* Reducido de 15px */
+            animation: bounce 1.5s infinite ease-in-out;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* Sombra más oscura para fondo negro */
+        }
+
+        /* Degradado para cada círculo */
+        .circle:nth-child(1) { background: linear-gradient(45deg, #6a35d9, #7c40f2); } /* Tono bajo de #7c40f2 */
+        .circle:nth-child(2) { background: linear-gradient(45deg, #1a42d0, #2050f4); animation-delay: 0.15s; } /* Tono bajo de #2050f4 */
+        .circle:nth-child(3) { background: linear-gradient(45deg, #a2c645, #b8e04f); animation-delay: 0.3s; } /* Tono bajo de #b8e04f */
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-25px); } /* Reducido de -50px para coincidir con el tamaño */
+        }
+
+        /* Header Principal */
+        #main-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 25px;
+            background-color: var(--bg-light);
+            box-shadow: 0 2px 8px var(--shadow-light);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            transition: all 0.3s ease-in-out;
+            border-bottom-left-radius: 15px;
+            border-bottom-right-radius: 15px;
+        }
+
+        /* Efecto al hacer scroll */
+        body.scrolled #main-header {
+            background-color: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 4px 12px var(--shadow-medium);
+            padding: 10px 20px;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-container img {
+            width: 60px; /* Tamaño del logo */
+            height: 60px;
+            border-radius: 50%; /* Hacemos el logo circular */
+            object-fit: cover;
+            padding: 5px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .menu-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 10px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px var(--shadow-light);
+        }
+
+        .menu-button:hover {
+            background-color: var(--bg-dark);
+            transform: scale(1.05);
+        }
+
+        .menu-button svg {
+            width: 30px;
+            height: 30px;
+            fill: var(--primary-color);
+            transition: fill 0.3s ease;
+        }
+
+        .menu-button:hover svg {
+            fill: var(--secondary-color);
+        }
+
+        /* Sidebar (Menú Lateral) */
+        #sidebar {
+            position: fixed;
+            top: 0;
+            right: -300px; /* Oculto inicialmente */
+            width: 280px;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.98);
+            box-shadow: -8px 0 20px var(--shadow-medium);
+            transition: right 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55); /* Efecto de rebote */
+            z-index: 2000;
+            padding-top: 100px; /* Espacio para el header */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border-top-left-radius: 20px;
+            border-bottom-left-radius: 20px;
+        }
+
+        #sidebar.open {
+            right: 0; /* Visible */
+        }
+
+        .sidebar-item {
+            display: flex;
+            flex-direction: column; /* Icono arriba, texto abajo */
+            align-items: center;
+            justify-content: center;
+            width: 120px; /* Tamaño de botón cuadrado */
+            height: 120px;
+            padding: 10px;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--text-light);
+            border: none;
+            border-radius: 20px; /* Curvas para los botones */
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s ease, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+            text-align: center;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+
+        .sidebar-item:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 12px 25px rgba(0,0,0,0.3);
+            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+        }
+
+        .sidebar-item .icon {
+            font-size: 2.5em; /* Tamaño del icono */
+            margin-bottom: 8px;
+            line-height: 1; /* Ajuste de línea para emojis */
+        }
+
+        /* Contenido Principal */
+        #content {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            min-height: calc(100vh - 100px); /* Ajuste para header */
+        }
+
+        .content-section {
+            background-color: var(--bg-light);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 6px 20px var(--shadow-light);
+            margin-bottom: 30px;
+            animation: fadeIn 0.5s ease-out;
+            display: none; /* Oculto por defecto */
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .content-section h2 {
+            color: var(--primary-color);
+            font-size: 2em;
+            margin-bottom: 25px;
+            text-align: center;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 10px;
+        }
+
+        /* Estilos de Botones de Acción */
+        .action-button, .challenge-button, .yt-button, .home-button, .drive-button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px var(--shadow-light);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none; /* Para enlaces */
+            color: white;
+        }
+
+        .action-button {
+            background-color: var(--primary-color);
+            margin-right: 10px;
+        }
+        .action-button:hover {
+            background-color: #6a35d9;
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 6px 15px var(--shadow-medium);
+        }
+
+        .challenge-button {
+            background: linear-gradient(90deg, var(--secondary-color), var(--accent-color));
+            color: white;
+        }
+        .challenge-button:hover {
+            background: linear-gradient(90deg, var(--accent-color), var(--secondary-color));
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 6px 15px var(--shadow-medium);
+        }
+
+        .yt-button {
+            background: linear-gradient(90deg, #f44336, #ff9800); /* Colores de YouTube */
+            color: white;
+        }
+        .yt-button:hover {
+            background: linear-gradient(90deg, #e53935, #fb8c00);
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 6px 15px var(--shadow-medium);
+        }
+
+        .drive-button {
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color)); /* Colores para Drive */
+            color: white;
+        }
+        .drive-button:hover {
+            background: linear-gradient(90deg, var(--secondary-color), var(--primary-color));
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 6px 15px var(--shadow-medium);
+        }
+
+
+        /* Estilos para los nuevos botones de navegación */
+        .navigation-buttons {
+            display: flex;
+            justify-content: flex-start; /* Alinea a la izquierda */
+            gap: 10px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .home-button {
+            background-color: var(--primary-color); /* Color principal para el botón de inicio */
+        }
+        .home-button:hover {
+            background-color: #6a35d9;
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 6px 15px var(--shadow-medium);
+        }
+
+        /* Estilos Específicos de Secciones */
+
+        /* Sección de Eventos */
+        .event-card {
+            background-color: var(--bg-dark);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 10px var(--shadow-light);
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        }
+        .event-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 18px var(--shadow-medium);
+        }
+        .event-card h3 {
+            color: var(--secondary-color);
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 1.4em;
+        }
+        .event-card p {
+            margin: 5px 0;
+            color: #555;
+        }
+        .event-description {
+            font-style: italic;
+            color: #777;
+            margin-top: 10px;
+            border-top: 1px dashed #ddd;
+            padding-top: 10px;
+        }
+
+        /* Sección de Herramientas (Juegos) */
+        .tool-category {
+            background-color: var(--bg-light);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 6px 15px var(--shadow-light);
+        }
+        .tool-category h3 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.6em;
+        }
+        .dynamic-buttons, .youtube-buttons, .drive-buttons-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .dynamic-item {
+            background: linear-gradient(45deg, #2050f4, #b8e04f);
+            color: white;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px var(--shadow-light);
+        }
+        .dynamic-item:hover {
+            background: linear-gradient(45deg, #b8e04f, #2050f4);
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 6px 15px var(--shadow-medium);
+        }
+
+        /* Área de Juego de Preguntas */
+        #quiz-game-area {
+            background-color: var(--bg-dark);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+            margin-top: 20px;
+            display: none; /* Oculto por defecto */
+        }
+        #quiz-game-area input[type="text"] {
+            width: calc(100% - 22px);
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+        }
+        #quiz-question {
+            font-size: 1.4em;
+            margin-bottom: 25px;
+            font-weight: 600;
+            color: var(--primary-color);
+            text-align: center;
+        }
+        #quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        #quiz-options button {
+            background-color: var(--bg-light);
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: left;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+            box-shadow: 0 2px 5px var(--shadow-light);
+        }
+        #quiz-options button:hover:not(:disabled) {
+            background-color: #e0e0e0;
+            transform: scale(1.01);
+            box-shadow: 0 4px 8px var(--shadow-medium);
+        }
+        #quiz-options button.correct {
+            background-color: var(--accent-color);
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 0 15px rgba(184, 224, 79, 0.5);
+            animation: pulseCorrect 0.5s ease-out;
+        }
+        #quiz-options button.incorrect {
+            background-color: #f44336;
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 0 15px rgba(244, 67, 54, 0.5);
+            animation: shakeIncorrect 0.3s ease-out;
+        }
+        @keyframes pulseCorrect {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+        @keyframes shakeIncorrect {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
+        }
+
+        #quiz-feedback {
+            margin-top: 20px;
+            font-weight: 700;
+            text-align: center;
+            font-size: 1.2em;
+        }
+        #quiz-score {
+            margin-top: 15px;
+            font-size: 1.1em;
+            text-align: center;
+            color: var(--secondary-color);
+            font-weight: 600;
+        }
+
+        /* Tabla de Clasificación */
+        #leaderboard-area {
+            background-color: var(--bg-dark);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+            margin-top: 20px;
+            display: none; /* Oculto por defecto */
+        }
+        #leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        #leaderboard-table th, #leaderboard-table td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        #leaderboard-table th {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 600;
+            border-color: var(--primary-color);
+        }
+        #leaderboard-table tr:nth-child(even) {
+            background-color: var(--bg-light);
+        }
+        #leaderboard-table tr:hover {
+            background-color: #eef;
+        }
+
+        /* Sección de Temas */
+        .topic-subsection { /* Solo quedan las subsecciones, no el uploader principal */
+            background-color: var(--bg-dark);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 6px 15px var(--shadow-light);
+        }
+        /* Se eliminaron los estilos específicos para topic-uploader */
+
+        /* Nueva navegación dentro de la sección de Temas */
+        .topic-sub-navigation {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        .topic-sub-navigation .action-button {
+            margin-right: 0; /* Eliminar margen extra */
+        }
+
+        /* Sección de Bienvenida Central */
+        #welcome-section {
+            position: fixed; /* Ocupa toda la pantalla */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: var(--bg-light); /* Fondo blanco sólido para la bienvenida */
+            z-index: 990; /* Detrás del header y sidebar, pero delante del contenido principal */
+            opacity: 1;
+            transition: opacity 0.5s ease-out;
+        }
+
+        #welcome-section.hidden {
+            opacity: 0;
+            pointer-events: none; /* Permite clics a través cuando está oculto */
+        }
+
+        #welcome-section .welcome-logo {
+            width: 150px; /* Logo más grande en la bienvenida */
+            height: 150px;
+            border-radius: 50%; /* Hacemos el logo circular */
+            object-fit: cover;
+            padding: 10px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+        }
+
+        #welcome-section .welcome-title {
+            text-align: center;
+        }
+
+        #welcome-section .welcome-title h1 {
+            font-size: 5em; /* Título muy grande */
+            margin: 0;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+
+            /* Degradado animado para el texto RED JUVENIL */
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color), var(--accent-color), var(--primary-color));
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientAnimation 10s ease infinite;
+        }
+
+        #welcome-section .welcome-title p {
+            font-size: 1.8em; /* Subtítulo grande */
+            margin: 10px 0 0;
+            font-weight: 500;
+
+            /* Degradado animado para el texto Villa Aldama */
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color), var(--accent-color), var(--primary-color));
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientAnimation 10s ease infinite;
+            animation-delay: 0.5s; /* Pequeño retraso para que se vea diferente al h1 */
+        }
+
+        /* Animación de degradado para el fondo */
+        @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Adaptabilidad (Media Queries) */
+        @media (max-width: 768px) {
+            .circle {
+                width: 30px; /* Ajuste para móviles */
+                height: 30px; /* Ajuste para móviles */
+                margin: 0 5px; /* Ajuste para móviles */
+            }
+            #main-header {
+                flex-direction: row; /* Mantener en fila el logo y el botón */
+                justify-content: space-between;
+                align-items: center;
+                padding: 10px 15px;
+            }
+            .logo-container {
+                margin-bottom: 0; /* Eliminar margen inferior */
+            }
+            .logo-container img {
+                width: 50px;
+                height: 50px;
+            }
+            .menu-button {
+                position: static; /* Volver a posición normal */
+            }
+            #sidebar {
+                width: 100%; /* El sidebar ocupa todo el ancho en móviles */
+                right: -100%;
+                border-radius: 0;
+                padding-top: 80px;
+            }
+            .sidebar-item {
+                width: 100px; /* Un poco más pequeño para móviles */
+                height: 100px;
+                margin-bottom: 15px;
+            }
+            #content {
+                padding: 15px;
+            }
+            .content-section {
+                padding: 20px;
+            }
+            .content-section h2 {
+                font-size: 1.8em;
+            }
+            .action-button, .challenge-button, .yt-button, .dynamic-item, .drive-button {
+                width: 100%; /* Botones ocupan todo el ancho */
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+            .dynamic-buttons, .youtube-buttons, .topic-sub-navigation, .drive-buttons-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            #welcome-section .welcome-logo {
+                width: 100px;
+                height: 100px;
+                margin-bottom: 20px;
+            }
+            #welcome-section .welcome-title h1 {
+                font-size: 3em; /* Ajuste para móviles */
+            }
+            #welcome-section .welcome-title p {
+                font-size: 1.2em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .circle {
+                width: 25px; /* Más pequeño para pantallas muy pequeñas */
+                height: 25px; /* Más pequeño para pantallas muy pequeñas */
+            }
+            .sidebar-item {
+                width: 90px;
+                height: 90px;
+                font-size: 0.9em;
+            }
+            .sidebar-item .icon {
+                font-size: 2em;
+            }
+            #quiz-question {
+                font-size: 1.2em;
+            }
+            #quiz-options button {
+                padding: 10px;
+                font-size: 0.9em;
+            }
+            #welcome-section .welcome-title h1 {
+                font-size: 2.5em; /* Más ajuste para pantallas muy pequeñas */
+            }
+            #welcome-section .welcome-title p {
+                font-size: 1em;
+            }
+        }
+
+        /* Mensaje de notificación */
+        .message-box {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 15px 25px;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            z-index: 3000;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            animation: slideInTop 0.5s forwards, fadeOut 0.5s 2.5s forwards;
+        }
+
+        @keyframes slideInTop {
+            from { top: -50px; opacity: 0; }
+            to { top: 20px; opacity: 1; }
+        }
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        /* Estilos específicos para los juegos dinámicos */
+        .game-section {
+            background-color: var(--bg-dark);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+            margin-top: 20px;
+            display: none; /* Oculto por defecto */
+            text-align: center;
+        }
+
+        .game-section h3 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        .game-prompt {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+        }
+
+        .game-clue {
+            font-size: 1.3em;
+            font-style: italic;
+            color: #555;
+            margin-bottom: 20px;
+        }
+
+        .game-answer {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: var(--accent-color);
+            margin-top: 20px;
+            display: none; /* Oculto por defecto */
+        }
+
+        .game-input {
+            width: calc(100% - 40px);
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .game-options button {
+            background-color: var(--bg-light);
+            border: 1px solid #ddd;
+            padding: 10px 15px;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+            box-shadow: 0 2px 5px var(--shadow-light);
+            margin: 5px;
+        }
+
+        .game-options button:hover:not(:disabled) {
+            background-color: #e0e0e0;
+            transform: scale(1.01);
+            box-shadow: 0 4px 8px var(--shadow-medium);
+        }
+        .game-options button.correct {
+            background-color: var(--accent-color);
+            color: white;
+            font-weight: 600;
+        }
+        .game-options button.incorrect {
+            background-color: #f44336;
+            color: white;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <!-- Pantalla de Carga -->
+    <div id="loading-screen">
+        <div class="circle" style="background-color: #7c40f2;"></div>
+        <div class="circle" style="background-color: #2050f4;"></div>
+        <div class="circle" style="background-color: #b8e04f;"></div>
+    </div>
+
+    <!-- Contenido Principal de la Aplicación -->
+    <div id="app" style="display: none;">
+        <!-- Header Principal -->
+        <header id="main-header">
+            <div class="logo-container">
+                <!-- Logo Principal -->
+                <img id="header-logo" src="https://placehold.co/60x60/7c40f2/ffffff?text=LOGO" alt="Logo de RED JUVENIL">
+            </div>
+            <button id="menu-toggle-button" class="menu-button" aria-label="Abrir menú">
+                <!-- Icono de menú (SVG para mejor escalabilidad) -->
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+                </svg>
+            </button>
+        </header>
+
+        <!-- Sidebar (Menú Lateral) -->
+        <aside id="sidebar">
+            <nav>
+                <button class="sidebar-item" data-section="eventos">
+                    <span class="icon">📅</span>
+                    <span>Eventos</span>
+                </button>
+                <button class="sidebar-item" data-section="herramientas">
+                    <span class="icon">🛠️</span>
+                    <span>Herramientas</span>
+                </button>
+                <button class="sidebar-item" data-section="temas">
+                    <span class="icon">📖</span>
+                    <span>Temas</span>
+                </button>
+            </nav>
+        </aside>
+
+        <!-- Sección de Bienvenida Central (Visible al inicio) -->
+        <section id="welcome-section">
+            <img id="welcome-logo" src="https://placehold.co/150x150/7c40f2/ffffff?text=LOGO" alt="Logo de RED JUVENIL" class="welcome-logo">
+            <div class="welcome-title">
+                <h1>RED JUVENIL</h1>
+                <p>Villa Aldama</p>
+            </div>
+        </section>
+
+        <!-- Contenido Principal de las Secciones (Ocultas al inicio) -->
+        <main id="content">
+            <!-- Sección de Eventos -->
+            <section id="eventos-section" class="content-section">
+                <div class="navigation-buttons">
+                    <button class="home-button" onclick="goToWelcomeSection()">🏠 Inicio</button>
+                </div>
+                <h2>Eventos Próximos</h2>
+                <div id="events-list">
+                    <!-- Ejemplos de Eventos (puedes personalizar o cargar desde una fuente externa) -->
+                    <div class="event-card">
+                        <h3>Noche de Adoración y Palabra</h3>
+                        <p>📅 Fecha: Sábado, 27 de Julio de 2025</p>
+                        <p>⏰ Hora: 7:00 PM - 9:00 PM</p>
+                        <p>📍 Lugar: Auditorio Principal - Iglesia Vida Plena</p>
+                        <p class="event-description">Una noche especial de encuentro con Dios a través de la alabanza y un mensaje inspirador sobre el propósito juvenil. ¡No te lo pierdas!</p>
+                    </div>
+                    <div class="event-card">
+                        <h3>Retiro Juvenil "Renovando Fuerzas"</h3>
+                        <p>📅 Fecha: 15 al 17 de Noviembre de 2025</p>
+                        <p>⏰ Hora: Viernes 5:00 PM (registro) - Domingo 1:00 PM (clausura)</p>
+                        <p>📍 Lugar: Campamento Monte Sion</p>
+                        <p class="event-description">¡Prepárate para un fin de semana lleno de actividades, compañerismo y crecimiento espiritual! Inscríbete pronto, cupo limitado.</p>
+                    </div>
+                    <div class="event-card">
+                        <h3>Estudio Bíblico "Raíces Firmes"</h3>
+                        <p>📅 Fecha: Todos los Martes</p>
+                        <p>⏰ Hora: 6:30 PM - 8:00 PM</p>
+                        <p>📍 Lugar: Salón de Jóvenes - Iglesia Vida Plena</p>
+                        <p class="event-description">Un espacio para profundizar en la Palabra de Dios y fortalecer nuestras raíces en la fe. ¡Abierto a todos los jóvenes!</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sección de Herramientas para Células -->
+            <section id="herramientas-section" class="content-section">
+                <div class="navigation-buttons">
+                    <button class="home-button" onclick="goToWelcomeSection()">🏠 Inicio</button>
+                </div>
+                <h2>Herramientas para Células Juveniles</h2>
+
+                <div class="tool-category">
+                    <h3>Dinámicas y Juegos Didácticos Bíblicos</h3>
+                    <div class="dynamic-buttons">
+                        <button class="dynamic-item" data-game="biblical-charades">🎭 Mímica Bíblica</button>
+                        <button class="dynamic-item" data-game="bible-pictionary">🎨 Pictionary Bíblico</button>
+                        <button class="dynamic-item" data-game="who-am-i">❓ ¿Quién Soy Yo?</button>
+                        <button class="dynamic-item" data-game="bible-trivia-easy">💡 Trivia Bíblica (Fácil)</button>
+                    </div>
+                    <div id="game-display-area" style="margin-top: 20px; border-top: 1px solid #eee; padding-top: 20px;">
+                        <p style="text-align: center; color: #777;">Selecciona una dinámica o juego para empezar.</p>
+
+                        <!-- Contenedores para cada juego dinámico -->
+                        <div id="charades-game-section" class="game-section">
+                            <h3>🎭 Mímica Bíblica</h3>
+                            <p class="game-prompt" id="charades-prompt"></p>
+                            <button class="action-button" onclick="generateNewCharade()">Generar otra</button>
+                        </div>
+
+                        <div id="pictionary-game-section" class="game-section">
+                            <h3>🎨 Pictionary Bíblico</h3>
+                            <p class="game-prompt" id="pictionary-prompt"></p>
+                            <button class="action-button" onclick="generateNewPictionary()">Generar otra</button>
+                        </div>
+
+                        <div id="who-am-i-game-section" class="game-section">
+                            <h3>❓ ¿Quién Soy Yo? (Personajes Bíblicos)</h3>
+                            <p class="game-clue" id="who-am-i-clue"></p>
+                            <p class="game-answer" id="who-am-i-answer"></p>
+                            <button class="action-button" id="show-who-am-i-answer">Mostrar Respuesta</button>
+                            <button class="action-button" onclick="generateNewWhoAmI()">Generar otra</button>
+                        </div>
+
+                        <div id="bible-trivia-easy-game-section" class="game-section">
+                            <h3>💡 Trivia Bíblica (Fácil)</h3>
+                            <p class="game-prompt" id="trivia-question"></p>
+                            <div class="game-options" id="trivia-options"></div>
+                            <p class="game-answer" id="trivia-answer"></p>
+                            <button class="action-button" id="show-trivia-answer">Mostrar Respuesta</button>
+                            <button class="action-button" onclick="generateNewTrivia()">Generar otra</button>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="tool-category">
+                    <h3>Juego de Desafíos Bíblicos (Quiz)</h3>
+                    <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin-bottom: 20px;">
+                        <button id="start-quiz-game" class="challenge-button">🚀 Iniciar Desafío</button>
+                        <!-- El botón "Ver Clasificación" ha sido eliminado -->
+                    </div>
+
+                    <div id="quiz-game-area" style="display: none;">
+                        <!-- El campo de ingreso de nombre ha sido eliminado -->
+                        <div id="quiz-question"></div>
+                        <div id="quiz-options"></div>
+                        <p id="quiz-feedback"></p>
+                        <p id="quiz-score"></p>
+                        <button id="next-question-button" class="action-button" style="display: none; width: 100%; margin-top: 20px;">Siguiente Pregunta</button>
+                    </div>
+
+                    <!-- La sección de la tabla de clasificación ha sido eliminada -->
+                    <div id="leaderboard-area" style="display: none;">
+                        <h3>Tabla de Clasificación (No Disponible)</h3>
+                        <p style="text-align: center; margin-top: 15px; color: #777; font-size: 0.9em;">La clasificación de puntuaciones no está disponible en esta versión.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sección de Temas de la Semana -->
+            <section id="temas-section" class="content-section">
+                <div class="navigation-buttons">
+                    <button class="home-button" onclick="goToWelcomeSection()">🏠 Inicio</button>
+                </div>
+                <h2>Temas de la Semana</h2>
+
+                <div class="topic-sub-navigation">
+                    <button class="action-button" onclick="showTemaContent('drive-links')">🔗 Enlaces Drive</button>
+                    <button class="action-button" onclick="showTemaContent('info')">💡 Info Semanal</button>
+                </div>
+
+                <div class="topic-subsection" id="drive-links-area">
+                    <h3>Enlaces de Google Drive</h3>
+                    <p>Aquí encontrarás materiales y recursos importantes.</p>
+                    <div class="drive-buttons-container" id="drive-links-container" style="margin-top: 20px;">
+                        <!-- Los enlaces de Drive se cargarán aquí dinámicamente desde el JS -->
+                        <p style="width: 100%; text-align: center; color: #777;">Cargando enlaces...</p>
+                    </div>
+                </div>
+
+                <div class="topic-subsection" id="weekly-info-area" style="display: none;">
+                    <h3>Información Semanal de Temas</h3>
+                    <p>Aquí se publicará información adicional, guías de estudio y sugerencias para trabajar con el tema de la semana.</p>
+                    <p>Mantente atento a las actualizaciones para sacar el máximo provecho de cada enseñanza.</p>
+                    <div id="weekly-topic-guidance" style="background-color: var(--bg-dark); padding: 20px; border-radius: 8px; margin-top: 15px; line-height: 1.6; color: #444;">
+                        <h4>Guía para el Tema Actual: <span id="current-topic-guidance-title-info">La Importancia de la Oración</span></h4>
+                        <p id="current-topic-guidance-content-info">En esta semana, profundizaremos en el poder transformador de la oración. Descubre cómo una comunicación constante con Dios puede fortalecer tu fe y guiar tus pasos. Reflexionaremos sobre pasajes bíblicos clave y compartiremos testimonios inspiradores.</p>
+                    </div>
+                </div>
+
+                <div class="tool-category youtube-links">
+                    <h3>Alabanzas de la Semana</h3>
+                    <p style="text-align: center; margin-bottom: 20px; color: #555;">¡Disfruta de estas alabanzas para edificar tu espíritu!</p>
+                    <div class="youtube-buttons">
+                        <!-- Personaliza estos enlaces con tus IDs de video de YouTube -->
+                        <a href="https://www.youtube.com/watch?v=VIDEO_ID_1" target="_blank" class="yt-button">🎵 Alabanza 1</a>
+                        <a href="https://www.youtube.com/watch?v=VIDEO_ID_2" target="_blank" class="yt-button">🎵 Alabanza 2</a>
+                        <a href="https://www.youtube.com/watch?v=VIDEO_ID_3" target="_blank" class="yt-button">🎵 Alabanza 3</a>
+                        <a href="https://www.youtube.com/watch?v=VIDEO_ID_4" target="_blank" class="yt-button">🎵 Alabanza 4</a>
+                        <a href="https://www.youtube.com/watch?v=VIDEO_ID_5" target="_blank" class="yt-button">🎵 Alabanza 5</a>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script type="module">
+        // Obtener los valores de las variables CSS para usarlos en JavaScript
+        const rootStyles = getComputedStyle(document.documentElement);
+        const primaryColor = rootStyles.getPropertyValue('--primary-color').trim();
+        const secondaryColor = rootStyles.getPropertyValue('--secondary-color').trim();
+        const accentColor = rootStyles.getPropertyValue('--accent-color').trim();
+        const errorColor = '#f44336'; // Color rojo directo para errores
+
+        // No se necesitan variables globales de Firebase ya que se ha eliminado la integración
+
+        // 1. Inicialización de la aplicación (sin Firebase)
+        async function initializeAppContent() {
+            // No hay inicialización de Firebase
+            console.log("Aplicación inicializada sin Firebase.");
+            // Cargar enlaces de Drive estáticos
+            loadDriveLinks();
+        }
+
+        // 2. Lógica de la Pantalla de Carga
+        window.addEventListener('load', async () => {
+            await initializeAppContent(); // Esperar a que el contenido de la app se inicialice
+            setTimeout(() => {
+                const loadingScreen = document.getElementById('loading-screen');
+                const appContainer = document.getElementById('app');
+                loadingScreen.classList.add('hidden'); // Inicia la transición de ocultar
+                // Espera a que la transición termine antes de cambiar el display
+                loadingScreen.addEventListener('transitionend', () => {
+                    loadingScreen.style.display = 'none';
+                    appContainer.style.display = 'block'; // Muestra el contenido principal
+                    document.getElementById('welcome-section').style.display = 'flex'; // Muestra la sección de bienvenida
+                }, { once: true }); // Asegura que el evento se dispare solo una vez
+            }, 3000); // 3000 milisegundos = 3 segundos (reducido para una carga más rápida)
+        });
+
+        // 3. Lógica del Menú Lateral (Sidebar)
+        const menuToggleButton = document.getElementById('menu-toggle-button');
+        const sidebar = document.getElementById('sidebar');
+
+        menuToggleButton.addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+        });
+
+        // Cierra el sidebar si se hace clic fuera de él
+        document.addEventListener('click', (event) => {
+            if (!sidebar.contains(event.target) && !menuToggleButton.contains(event.target) && sidebar.classList.contains('open')) {
+                sidebar.classList.remove('open');
+            }
+        });
+
+        // 4. Lógica para Mostrar Secciones de Contenido
+        const contentSections = document.querySelectorAll('.content-section');
+        const welcomeSection = document.getElementById('welcome-section'); // Obtener la sección de bienvenida
+
+        function showSection(sectionId) {
+            // Ocultar la sección de bienvenida inmediatamente
+            if (welcomeSection) {
+                welcomeSection.style.display = 'none';
+                welcomeSection.classList.add('hidden');
+            }
+
+            // Oculta todas las secciones de contenido
+            contentSections.forEach(section => {
+                section.style.display = 'none';
+            });
+
+            // Muestra la sección seleccionada
+            const targetSection = document.getElementById(sectionId);
+            if (targetSection) {
+                targetSection.style.display = 'block';
+                // Forzar reflow para reiniciar la animación fadeIn
+                void targetSection.offsetWidth;
+                targetSection.style.opacity = '0';
+                targetSection.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    targetSection.style.opacity = '1';
+                    targetSection.style.transform = 'translateY(0)';
+                }, 10); // Pequeño retraso para que la animación se aplique
+            }
+            sidebar.classList.remove('open'); // Cierra el sidebar al seleccionar una sección
+        }
+
+        // Función para ir a la sección de bienvenida
+        function goToWelcomeSection() {
+            // Oculta todas las secciones de contenido
+            contentSections.forEach(section => {
+                section.style.display = 'none';
+            });
+
+            // Muestra la sección de bienvenida
+            if (welcomeSection) {
+                welcomeSection.style.display = 'flex'; // Asegúrate de que esté visible
+                welcomeSection.classList.remove('hidden'); // Asegúrate de que no esté oculto por opacidad
+                // Forzar reflow para reiniciar la animación fadeIn si es necesario
+                void welcomeSection.offsetWidth;
+                welcomeSection.style.opacity = '0';
+                setTimeout(() => {
+                    welcomeSection.style.opacity = '1';
+                }, 10);
+            }
+            sidebar.classList.remove('open'); // Cierra el sidebar si está abierto
+        }
+        // Hacer la función accesible globalmente
+        window.goToWelcomeSection = goToWelcomeSection;
+
+
+        // Asigna eventos a los botones del sidebar
+        document.querySelectorAll('.sidebar-item').forEach(button => {
+            button.addEventListener('click', (event) => {
+                const sectionId = event.currentTarget.dataset.section + '-section';
+                showSection(sectionId);
+            });
+        });
+
+        // 5. Efecto de Scroll para el Header
+        window.addEventListener('scroll', () => {
+            const body = document.body;
+            if (window.scrollY > 50) { // Si el scroll es mayor a 50px
+                body.classList.add('scrolled');
+            } else {
+                body.classList.remove('scrolled');
+            }
+        });
+
+        // 6. Lógica de la Sección de Herramientas (Juegos Bíblicos)
+
+        // Referencias a los contenedores de juego
+        const gameDisplayArea = document.getElementById('game-display-area');
+        const charadesGameSection = document.getElementById('charades-game-section');
+        const pictionaryGameSection = document.getElementById('pictionary-game-section');
+        const whoAmIGameSection = document.getElementById('who-am-i-game-section');
+        const bibleTriviaEasyGameSection = document.getElementById('bible-trivia-easy-game-section');
+
+        // Ocultar todas las secciones de juego al inicio
+        function hideAllGameSections() {
+            charadesGameSection.style.display = 'none';
+            pictionaryGameSection.style.display = 'none';
+            whoAmIGameSection.style.display = 'none';
+            bibleTriviaEasyGameSection.style.display = 'none';
+        }
+
+        // a. Dinámicas y Juegos Didácticos
+        document.querySelectorAll('.dynamic-item').forEach(button => {
+            button.addEventListener('click', (event) => {
+                const gameType = event.currentTarget.dataset.game;
+                hideAllGameSections(); // Ocultar todas las secciones antes de mostrar la seleccionada
+
+                switch(gameType) {
+                    case 'biblical-charades':
+                        charadesGameSection.style.display = 'block';
+                        generateNewCharade();
+                        break;
+                    case 'bible-pictionary':
+                        pictionaryGameSection.style.display = 'block';
+                        generateNewPictionary();
+                        break;
+                    case 'who-am-i':
+                        whoAmIGameSection.style.display = 'block';
+                        generateNewWhoAmI();
+                        break;
+                    case 'bible-trivia-easy':
+                        bibleTriviaEasyGameSection.style.display = 'block';
+                        generateNewTrivia();
+                        break;
+                }
+            });
+        });
+
+        // Lógica para Mímica Bíblica
+        const charades = [
+            "El arca de Noé", "La zarza ardiente", "David y Goliat",
+            "La pesca milagrosa", "La conversión de Saulo", "El diluvio universal",
+            "La torre de Babel", "Jonás en el pez grande", "El nacimiento de Jesús",
+            "La resurrección de Lázaro", "Jesús caminando sobre el agua",
+            "La multiplicación de los panes y los peces", "La crucifixión de Jesús",
+            "La resurrección de Jesús", "El buen samaritano", "La parábola del hijo pródigo",
+            "La creación del mundo", "Adán y Eva", "Caín y Abel", "Abraham sacrificando a Isaac",
+            "Jacob y la escalera", "José y sus hermanos", "Moisés abriendo el Mar Rojo",
+            "Los Diez Mandamientos", "El maná en el desierto", "Josué y la caída de Jericó",
+            "Sansón y Dalila", "Rut y Noemí", "Elías y los profetas de Baal",
+            "Daniel en el foso de los leones", "Ester salvando a su pueblo", "Juan el Bautista",
+            "La transfiguración de Jesús", "La última cena", "Pedro negando a Jesús",
+            "Tomás el incrédulo", "La ascensión de Jesús", "Pentecostés", "Pablo en el camino a Damasco"
+        ];
+        const charadesPrompt = document.getElementById('charades-prompt');
+
+        function generateNewCharade() {
+            const randomCharade = charades[Math.floor(Math.random() * charades.length)];
+            charadesPrompt.textContent = `"${randomCharade}"`;
+        }
+        window.generateNewCharade = generateNewCharade; // Hacer accesible globalmente
+
+        // Lógica para Pictionary Bíblico
+        const pictionary = [
+            "El Jardín del Edén", "Las tablas de la ley", "El pesebre de Jesús",
+            "La torre de Babel", "Jonás en el pez grande", "La crucifixión",
+            "El Buen Samaritano", "La Última Cena", "La creación del mundo",
+            "El maná en el desierto", "El muro de Jericó",
+            "El arca de Noé", "La zarza ardiente", "David y Goliat",
+            "La pesca milagrosa", "La conversión de Saulo", "El diluvio universal",
+            "La multiplicación de los panes y los peces", "La resurrección de Lázaro",
+            "Jesús caminando sobre el agua", "El nacimiento de Jesús",
+            "La transfiguración", "El bautismo de Jesús", "La tentación de Jesús",
+            "La curación del paralítico", "La resurrección de la hija de Jairo",
+            "La entrada triunfal en Jerusalén", "La traición de Judas", "La negación de Pedro",
+            "El juicio de Jesús", "La tumba vacía", "El camino a Emaús", "La ascensión"
+        ];
+        const pictionaryPrompt = document.getElementById('pictionary-prompt');
+
+        function generateNewPictionary() {
+            const randomPictionary = pictionary[Math.floor(Math.random() * pictionary.length)];
+            pictionaryPrompt.textContent = `"${randomPictionary}"`;
+        }
+        window.generateNewPictionary = generateNewPictionary; // Hacer accesible globalmente
+
+        // Lógica para ¿Quién Soy Yo?
+        const characters = [
+            { name: "Moisés", clue: "Liberé a mi pueblo de Egipto y dividí el mar Rojo." },
+            { name: "María", clue: "Fui la madre de Jesús, concebido por el Espíritu Santo." },
+            { name: "Pedro", clue: "Fui un pescador que se convirtió en un apóstol y negué a Jesús tres veces." },
+            { name: "Eva", clue: "Fui la primera mujer, creada de una costilla de Adán." },
+            { name: "David", clue: "Fui un pastor que derrotó a un gigante con una honda y llegué a ser rey." },
+            { name: "José (hijo de Jacob)", clue: "Fui vendido por mis hermanos y llegué a ser gobernador en Egipto." },
+            { name: "Pablo", clue: "Fui un perseguidor de cristianos y luego me convertí en un gran apóstol." },
+            { name: "Sansón", clue: "Tuve una fuerza sobrenatural que residía en mi cabello." },
+            { name: "Abraham", clue: "Fui llamado por Dios para ser padre de muchas naciones." },
+            { name: "Sara", clue: "Fui la esposa de Abraham y di a luz a Isaac en mi vejez." },
+            { name: "Isaac", clue: "Fui el hijo de la promesa de Abraham y Sara." },
+            { name: "Jacob", clue: "Tuve doce hijos que formaron las doce tribus de Israel." },
+            { name: "Rut", clue: "Fui una moabita que mostró gran lealtad a mi suegra Noemí." },
+            { name: "Ester", clue: "Fui una reina que salvó a mi pueblo de la destrucción." },
+            { name: "Samuel", clue: "Fui un profeta que ungió a los primeros reyes de Israel." },
+            { name: "Elías", clue: "Fui un profeta que desafió a los profetas de Baal y fui llevado al cielo en un carro de fuego." },
+            { name: "Juan el Bautista", clue: "Preparé el camino para Jesús y lo bauticé en el río Jordán." },
+            { name: "María Magdalena", clue: "Fui una de las mujeres que siguió a Jesús y fui la primera en verlo resucitado." },
+            { name: "Juan (Apóstol)", clue: "Fui el discípulo amado de Jesús y escribí un evangelio y el libro de Apocalipsis." },
+            { name: "Mateo", clue: "Fui un recaudador de impuestos que Jesús llamó para ser su discípulo." },
+            { name: "Lázaro", clue: "Fui resucitado por Jesús después de estar muerto por cuatro días." },
+            { name: "Zaqueo", clue: "Fui un jefe de publicanos que subió a un sicómoro para ver a Jesús." },
+            { name: "Noé", clue: "Construí un arca para salvar a mi familia y a los animales del diluvio." },
+            { name: "Daniel", clue: "Interpreté sueños y fui lanzado al foso de los leones, pero Dios me salvó." }
+        ];
+        const whoAmIClue = document.getElementById('who-am-i-clue');
+        const whoAmIAnswer = document.getElementById('who-am-i-answer');
+        const showWhoAmIAnswerButton = document.getElementById('show-who-am-i-answer');
+        let currentWhoAmIChar = null;
+
+        function generateNewWhoAmI() {
+            currentWhoAmIChar = characters[Math.floor(Math.random() * characters.length)];
+            whoAmIClue.textContent = `Pista: "${currentWhoAmIChar.clue}"`;
+            whoAmIAnswer.textContent = `Respuesta: ${currentWhoAmIChar.name}`;
+            whoAmIAnswer.style.display = 'none'; // Ocultar la respuesta
+            showWhoAmIAnswerButton.style.display = 'inline-block'; // Mostrar botón de mostrar respuesta
+        }
+        window.generateNewWhoAmI = generateNewWhoAmI; // Hacer accesible globalmente
+
+        showWhoAmIAnswerButton.addEventListener('click', () => {
+            whoAmIAnswer.style.display = 'block'; // Mostrar la respuesta
+            showWhoAmIAnswerButton.style.display = 'none'; // Ocultar el botón
+        });
+
+        // Lógica para Trivia Bíblica (Fácil)
+        const easyTrivia = [
+            { q: "¿Quién fue el primer hombre creado por Dios?", a: "Adán" },
+            { q: "¿Qué animal habló con Eva en el Jardín del Edén?", a: "Serpiente" },
+            { q: "¿Cuál fue el nombre del arca que construyó Noé?", a: "El Arca de Noé" },
+            { q: "¿Cuántos días y noches llovió durante el diluvio?", a: "40 días y 40 noches" },
+            { q: "¿Quién fue el hermano de Abel?", a: "Caín" },
+            { q: "¿Quién fue el padre de la fe?", a: "Abraham" },
+            { q: "¿Cuál fue el monte donde Moisés recibió los Diez Mandamientos?", a: "Sinaí" },
+            { q: "¿Qué ciudad cayó después de que el pueblo de Israel marchara alrededor de ella?", a: "Jericó" },
+            { q: "¿Quién mató a Goliat con una honda?", a: "David" },
+            { q: "¿Cuál es el primer libro de la Biblia?", a: "Génesis" },
+            { q: "¿Quién fue el profeta que fue tragado por un gran pez?", a: "Jonás" },
+            { q: "¿Cómo se llamaba la madre de Jesús?", a: "María" },
+            { q: "¿En qué ciudad nació Jesús?", a: "Belén" },
+            { q: "¿Cuántos discípulos principales tuvo Jesús?", a: "Doce" },
+            { q: "¿Cuál fue el milagro de Jesús en Caná de Galilea?", a: "Convertir el agua en vino" },
+            { q: "¿Quién traicionó a Jesús por treinta piezas de plata?", a: "Judas Iscariote" },
+            { q: "¿Qué apóstol negó a Jesús tres veces?", a: "Pedro" },
+            { q: "¿En qué día resucitó Jesús?", a: "Tercer día" },
+            { q: "¿Cuál es el último libro de la Biblia?", a: "Apocalipsis" },
+            { q: "¿Quién fue el primer rey de Israel?", a: "Saúl" },
+            { q: "¿Qué nombre le dio Dios a Jacob después de luchar con un ángel?", a: "Israel" },
+            { q: "¿Cuál fue el nombre del hijo de Abraham y Sara?", a: "Isaac" },
+            { q: "¿Qué instrumento musical tocaba David para calmar a Saúl?", a: "Arpa" },
+            { q: "¿Quién fue la primera persona en ver a Jesús resucitado?", a: "María Magdalena" },
+            { q: "¿Qué significa 'Emanuel'?", a: "Dios con nosotros" }
+        ];
+        const triviaQuestion = document.getElementById('trivia-question');
+        const triviaOptions = document.getElementById('trivia-options'); // Para opciones de respuesta (si se implementan)
+        const triviaAnswer = document.getElementById('trivia-answer');
+        const showTriviaAnswerButton = document.getElementById('show-trivia-answer');
+        let currentTrivia = null;
+
+        function generateNewTrivia() {
+            currentTrivia = easyTrivia[Math.floor(Math.random() * easyTrivia.length)];
+            triviaQuestion.textContent = `Pregunta: "${currentTrivia.q}"`;
+            triviaAnswer.textContent = `Respuesta: ${currentTrivia.a}`;
+            triviaAnswer.style.display = 'none'; // Ocultar la respuesta
+            showTriviaAnswerButton.style.display = 'inline-block'; // Mostrar botón de mostrar respuesta
+            triviaOptions.innerHTML = ''; // Limpiar opciones si las hubiera
+        }
+        window.generateNewTrivia = generateNewTrivia; // Hacer accesible globalmente
+
+        showTriviaAnswerButton.addEventListener('click', () => {
+            triviaAnswer.style.display = 'block'; // Mostrar la respuesta
+            showTriviaAnswerButton.style.display = 'none'; // Ocultar el botón
+        });
+
+
+        // b. Juego de Desafíos Bíblicos (Quiz)
+        const quizQuestions = [
+            {
+                question: "¿Quién fue el hombre que construyó un arca por mandato de Dios para salvar a su familia y a los animales del diluvio?",
+                options: ["Abraham", "Noé", "Moisés", "David"],
+                answer: "Noé",
+                type: "multiple-choice"
+            },
+            {
+                question: "¿Cuál fue el primer milagro de Jesús, según el evangelio de Juan, que realizó en una boda?",
+                options: ["Curar a un ciego", "Multiplicar los panes y los peces", "Convertir el agua en vino", "Resucitar a Lázaro"],
+                answer: "Convertir el agua en vino",
+                type: "multiple-choice"
+            },
+            {
+                question: "¿Cuántos libros tiene el Nuevo Testamento, la segunda parte de la Biblia?",
+                options: ["27", "39", "66", "23"],
+                answer: "27",
+                type: "multiple-choice"
+            },
+            {
+                question: "¿Quién fue vendido por sus hermanos como esclavo y luego llegó a ser un poderoso líder en Egipto?",
+                options: ["Isaac", "Jacob", "José", "Benjamín"],
+                answer: "José",
+                type: "multiple-choice"
+            },
+            {
+                question: "¿En qué monte recibió Moisés los Diez Mandamientos de parte de Dios?",
+                options: ["Monte de los Olivos", "Monte Carmelo", "Monte Sinaí", "Monte Sión"],
+                answer: "Monte Sinaí",
+                type: "multiple-choice"
+            },
+            {
+                question: "Menciona el nombre del profeta que fue tragado por un gran pez.",
+                options: [], // Abierta
+                answer: "Jonás",
+                type: "open"
+            },
+            {
+                question: "¿Cuál es el nombre del jardín donde Adán y Eva vivieron antes de desobedecer a Dios?",
+                options: [], // Abierta
+                answer: "Edén",
+                type: "open"
+            },
+            {
+                question: "¿Quién fue el apóstol que negó a Jesús tres veces antes de que cantara el gallo?",
+                options: [], // Abierta
+                answer: "Pedro",
+                type: "open"
+            },
+            {
+                question: "¿Qué tipo de árbol fue prohibido a Adán y Eva comer en el Jardín del Edén?",
+                options: ["Árbol de la vida", "Árbol del conocimiento del bien y del mal", "Higuera", "Olivo"],
+                answer: "Árbol del conocimiento del bien y del mal",
+                type: "multiple-choice"
+            },
+            {
+                question: "¿Cuál es el libro de la Biblia que narra la historia de la creación?",
+                options: ["Éxodo", "Génesis", "Levítico", "Números"],
+                answer: "Génesis",
+                type: "multiple-choice"
+            },
+            {
+                question: "¿Quién fue el rey de Israel conocido por su sabiduría?",
+                options: ["David", "Saúl", "Salomón", "Jeroboam"],
+                answer: "Salomón",
+                type: "multiple-choice"
+            },
+            {
+                question: "¿Cuántos panes y cuántos peces usó Jesús para alimentar a cinco mil personas?",
+                options: ["5 panes y 2 peces", "7 panes y 2 peces", "12 panes y 3 peces", "4 panes y 1 pez"],
+                answer: "5 panes y 2 peces",
+                type: "multiple-choice"
+            },
+            {
+                question: "¿Quién fue el profeta que fue llevado al cielo en un torbellino?",
+                options: ["Eliseo", "Isaías", "Elías", "Jeremías"],
+                answer: "Elías",
+                type: "multiple-choice"
+            },
+            {
+                question: "¿Cuál es el mandamiento más importante, según Jesús?",
+                options: ["Amar a Dios", "Amar al prójimo", "Honrar a padre y madre", "No matarás"],
+                answer: "Amar a Dios",
+                type: "multiple-choice"
+            },
+            {
+                question: "¿Quién fue la primera persona en nacer en la Biblia?",
+                options: ["Adán", "Eva", "Caín", "Abel"],
+                answer: "Caín",
+                type: "multiple-choice"
+            },
+            {
+                question: "¿Qué río cruzaron los israelitas para entrar a la Tierra Prometida?",
+                options: [],
+                answer: "Jordán",
+                type: "open"
+            },
+            {
+                question: "¿Quién fue el apóstol que era recaudador de impuestos antes de seguir a Jesús?",
+                options: [],
+                answer: "Mateo",
+                type: "open"
+            },
+            {
+                question: "¿Qué ciudad fue destruida por fuego y azufre debido a su maldad?",
+                options: [],
+                answer: "Sodoma",
+                type: "open"
+            },
+            {
+                question: "¿Quién fue el profeta que tuvo una visión de un valle de huesos secos?",
+                options: ["Ezequiel", "Jeremías", "Isaías", "Daniel"],
+                answer: "Ezequiel",
+                type: "multiple-choice"
+            },
+            {
+                question: "¿Cuál es el nombre del ángel que anunció el nacimiento de Jesús a María?",
+                options: ["Miguel", "Gabriel", "Rafael", "Uriel"],
+                answer: "Gabriel",
+                type: "multiple-choice"
+            }
+        ];
+
+        let shuffledQuestions = [];
+        let currentQuestionIndex = 0;
+        let correctAnswersCount = 0; // Contador de respuestas correctas
+        let score = 0; // Puntuación final (1 punto por cada 5 correctas)
+
+        const quizGameArea = document.getElementById('quiz-game-area');
+        const quizQuestion = document.getElementById('quiz-question');
+        const quizOptions = document.getElementById('quiz-options');
+        const nextQuestionButton = document.getElementById('next-question-button');
+        const quizFeedback = document.getElementById('quiz-feedback');
+        const quizScore = document.getElementById('quiz-score');
+        const startQuizButton = document.getElementById('start-quiz-game');
+        const leaderboardArea = document.getElementById('leaderboard-area');
+
+        startQuizButton.addEventListener('click', () => {
+            quizGameArea.style.display = 'block';
+            leaderboardArea.style.display = 'none'; // Asegura que el área de clasificación esté oculta
+            hideAllGameSections(); // Ocultar juegos dinámicos al iniciar el quiz
+            resetQuiz();
+        });
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function loadQuestion() {
+            if (currentQuestionIndex < shuffledQuestions.length) {
+                const q = shuffledQuestions[currentQuestionIndex];
+                quizQuestion.textContent = q.question;
+                quizOptions.innerHTML = '';
+                quizFeedback.textContent = '';
+                nextQuestionButton.style.display = 'none'; // Ocultar hasta que se responda
+
+                if (q.type === "multiple-choice") {
+                    shuffleArray(q.options).forEach(option => {
+                        const button = document.createElement('button');
+                        button.textContent = option;
+                        button.addEventListener('click', () => checkAnswer(option, q.answer, button));
+                        quizOptions.appendChild(button);
+                    });
+                } else if (q.type === "open") {
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.placeholder = 'Escribe tu respuesta aquí...';
+                    input.id = 'open-answer-input';
+                    quizOptions.appendChild(input);
+
+                    const submitButton = document.createElement('button');
+                    submitButton.textContent = 'Responder';
+                    submitButton.classList.add('action-button');
+                    submitButton.style.marginTop = '15px';
+                    submitButton.addEventListener('click', () => checkOpenAnswer(input.value, q.answer, submitButton));
+                    quizOptions.appendChild(submitButton);
+                }
+            } else {
+                endQuiz();
+            }
+        }
+
+        function checkAnswer(selectedOption, correctAnswer, button) {
+            // Deshabilitar todas las opciones después de la selección
+            Array.from(quizOptions.children).forEach(btn => btn.disabled = true);
+
+            if (selectedOption === correctAnswer) {
+                correctAnswersCount += 1; // Incrementar contador de respuestas correctas
+                quizFeedback.textContent = "¡Correcto! 🎉";
+                button.classList.add('correct');
+            } else {
+                quizFeedback.textContent = `Incorrecto. La respuesta correcta era: ${correctAnswer}`;
+                button.classList.add('incorrect');
+                // Resaltar la respuesta correcta si es de opción múltiple
+                if (button.tagName === 'BUTTON') { // Asegura que es un botón de opción múltiple
+                    const correctBtn = Array.from(quizOptions.children).find(btn => btn.textContent === correctAnswer);
+                    if (correctBtn) {
+                        correctBtn.classList.add('correct');
+                    }
+                }
+            }
+            // Calcular la puntuación basada en respuestas correctas
+            score = Math.floor(correctAnswersCount / 5);
+            quizScore.textContent = `Puntuación: ${score} (Respuestas correctas: ${correctAnswersCount})`;
+            nextQuestionButton.style.display = 'block'; // Mostrar el botón "Siguiente"
+        }
+
+        function checkOpenAnswer(userAnswer, correctAnswer, submitButton) {
+            const inputElement = document.getElementById('open-answer-input');
+            inputElement.disabled = true;
+            submitButton.disabled = true;
+
+            // Normalizar respuestas para comparación (quitar acentos, convertir a minúsculas)
+            const normalize = (str) => str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+            if (normalize(userAnswer) === normalize(correctAnswer)) {
+                correctAnswersCount += 1; // Incrementar contador de respuestas correctas
+                quizFeedback.textContent = "¡Correcto!  ";
+                inputElement.style.borderColor = accentColor; // Usar la constante JavaScript
+                inputElement.style.boxShadow = `0 0 10px ${accentColor}`; // Usar la constante JavaScript
+            } else {
+                quizFeedback.textContent = `Incorrecto. La respuesta correcta era: ${correctAnswer}`;
+                inputElement.style.borderColor = errorColor; // Usar la constante JavaScript
+                inputElement.style.boxShadow = `0 0 10px ${errorColor}`; // Usar la constante JavaScript
+            }
+            // Calcular la puntuación basada en respuestas correctas
+            score = Math.floor(correctAnswersCount / 5);
+            quizScore.textContent = `Puntuación: ${score} (Respuestas correctas: ${correctAnswersCount})`;
+            nextQuestionButton.style.display = 'block';
+        }
+
+
+        nextQuestionButton.addEventListener('click', () => {
+            currentQuestionIndex++;
+            loadQuestion();
+        });
+
+        function resetQuiz() {
+            currentQuestionIndex = 0;
+            correctAnswersCount = 0; // Reiniciar contador de respuestas correctas
+            score = 0; // Reiniciar puntuación
+            quizScore.textContent = `Puntuación: 0 (Respuestas correctas: 0)`;
+            quizFeedback.textContent = '';
+            nextQuestionButton.style.display = 'none';
+            quizOptions.innerHTML = '';
+            // Barajar y seleccionar preguntas para un nuevo juego
+            shuffledQuestions = shuffleArray([...quizQuestions]).slice(0, 5); // Limitar a 5 preguntas por juego
+            loadQuestion(); // Cargar la primera pregunta
+        }
+
+        function endQuiz() {
+            quizQuestion.textContent = `¡Juego Terminado! Tu puntuación final es: ${score} de ${Math.floor(5 / 5)}`; // Siempre 5 preguntas
+            quizOptions.innerHTML = '';
+            quizFeedback.textContent = '';
+            nextQuestionButton.style.display = 'none';
+
+            showMessage(`Juego terminado. Tu puntuación es ${score}.`, 'info');
+        }
+
+        // Función para mostrar mensajes personalizados (reemplaza alert())
+        function showMessage(message, type = 'info') {
+            const messageBox = document.createElement('div');
+            messageBox.textContent = message;
+            messageBox.classList.add('message-box'); // Usar la clase CSS definida
+
+            if (type === 'success') {
+                messageBox.style.backgroundColor = accentColor;
+            } else if (type === 'error') {
+                messageBox.style.backgroundColor = errorColor;
+            } else { // info
+                messageBox.style.backgroundColor = primaryColor;
+            }
+
+            document.body.appendChild(messageBox);
+
+            setTimeout(() => {
+                messageBox.remove();
+            }, 3000); // El mensaje desaparece después de 3 segundos
+        }
+
+        // 7. Lógica de la Sección de Temas de la Semana
+
+        // Lógica para mostrar/ocultar sub-secciones dentro de la sección de Temas
+        function showTemaContent(contentType) {
+            // Ocultar todas las sub-secciones de Temas
+            document.getElementById('drive-links-area').style.display = 'none';
+            document.getElementById('weekly-info-area').style.display = 'none';
+
+            // Mostrar la sub-sección solicitada
+            if (contentType === 'drive-links') {
+                document.getElementById('drive-links-area').style.display = 'block';
+                loadDriveLinks(); // Cargar los enlaces de Drive estáticos
+            } else if (contentType === 'info') {
+                document.getElementById('weekly-info-area').style.display = 'block';
+                // Cargar la información semanal si está disponible (simulado)
+                document.getElementById('current-topic-guidance-title-info').textContent = 'Guía Semanal de Temas';
+                document.getElementById('current-topic-guidance-content-info').innerHTML = '<p>Esta sección contendrá la guía y reflexiones para el tema de la semana, que se actualizará regularmente. ¡Mantente atento!</p>';
+            }
+        }
+        // Hacer la función accesible globalmente
+        window.showTemaContent = showTemaContent;
+
+        // Al seleccionar la pestaña "Temas" desde el sidebar, mostrar por defecto la sección de Enlaces Drive
+        document.querySelector('.sidebar-item[data-section="temas"]').addEventListener('click', () => {
+            showSection('temas-section');
+            showTemaContent('drive-links'); // Por defecto, muestra la sección de descarga de PDFs
+        });
+
+
+        // Lógica de carga de enlaces de Drive (ahora estáticos)
+        const driveLinksContainer = document.getElementById('drive-links-container');
+
+        // Array de objetos con los enlaces de Drive
+        const staticDriveLinks = [
+            { name: "Documento de Estudio 1", url: "https://docs.google.com/document/d/1example_doc1/edit?usp=sharing" },
+            { name: "Presentación de Célula", url: "https://docs.google.com/presentation/d/1example_slides1/edit?usp=sharing" },
+            { name: "Hoja de Trabajo Semanal", url: "https://docs.google.com/spreadsheets/d/1example_sheet1/edit?usp=sharing" },
+            { name: "Audio Mensaje Semanal", url: "https://drive.google.com/file/d/1example_audio1/view?usp=sharing" },
+            { name: "Video de Enseñanza", url: "https://drive.google.com/file/d/1example_video1/view?usp=sharing" },
+            { name: "Plan de Lectura Bíblica", url: "https://docs.google.com/document/d/1example_doc2/edit?usp=sharing" },
+            { name: "Recursos para Líderes", url: "https://drive.google.com/drive/folders/1example_folder1?usp=sharing" }
+        ];
+
+        // Cargar y mostrar los enlaces de Drive estáticos
+        function loadDriveLinks() {
+            driveLinksContainer.innerHTML = ''; // Limpiar enlaces existentes
+            if (staticDriveLinks.length === 0) {
+                driveLinksContainer.innerHTML = '<p style="width: 100%; text-align: center; color: #777;">No hay enlaces de Drive disponibles.</p>';
+                return;
+            }
+
+            staticDriveLinks.forEach((linkData) => {
+                const link = document.createElement('a');
+                link.href = linkData.url;
+                link.target = "_blank";
+                link.classList.add('drive-button'); // Aplicar la clase de botón
+                link.textContent = `🔗 ${linkData.name}`;
+                driveLinksContainer.appendChild(link);
+            });
+        }
+    </script>
+</body>
+</html>
